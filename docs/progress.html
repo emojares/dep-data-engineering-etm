@@ -159,6 +159,38 @@
     .days.warn   { color: var(--amber); }
     .days.breach { color: #DC2626; }
 
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-bar input, .filter-bar select {
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.875rem;
+      outline: none;
+      background: white;
+    }
+
+    .filter-bar input { flex: 1; min-width: 180px; }
+    .filter-bar input:focus, .filter-bar select:focus { border-color: var(--blue); }
+    .filter-bar select { cursor: pointer; }
+
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    th.sortable:hover { color: var(--navy); }
+
+    th .sort-icon { margin-left: 4px; opacity: 0.4; font-size: 0.7rem; }
+    th.asc  .sort-icon { opacity: 1; }
+    th.desc .sort-icon { opacity: 1; }
+
     a { color: var(--blue); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
@@ -216,6 +248,22 @@
     <div class="milestone-grid" id="milestone-grid"></div>
   </div>
 
+  <div class="filter-bar">
+    <input id="search" type="text" placeholder="Search by builder, cohort, or milestone…" oninput="renderAll()">
+    <select id="filter-milestone" onchange="renderAll()">
+      <option value="">All Milestones</option>
+      <option>M0</option><option>M1</option><option>M2</option>
+      <option>M3</option><option>M4</option><option>M5</option><option>M6</option>
+    </select>
+    <select id="filter-status" onchange="renderAll()">
+      <option value="">All Statuses</option>
+      <option value="pending-review">Pending Review</option>
+      <option value="needs-improvement">Needs Improvement</option>
+      <option value="passed">Passed</option>
+      <option value="checking">Checking</option>
+    </select>
+  </div>
+
   <div class="section">
     <h2>👀 Pending Reviewer Action</h2>
     <div id="queue-pending"><div class="loading">Loading…</div></div>
@@ -238,6 +286,13 @@ const OWNER      = 'dataengineeringpilipinas';
 const REPO       = 'dep-data-engineering-open-track';
 const MILESTONES = ['M0','M1','M2','M3','M4','M5','M6'];
 
+let allIssues = [];
+const sortState = {
+  pending:     { col: 'days', dir: 'desc' },
+  improvement: { col: 'days', dir: 'desc' },
+  all:         { col: 'days', dir: 'desc' },
+};
+
 function extract(body, heading) {
   const m = (body || '').match(new RegExp(`###\\s+${heading}\\s*\\n+([^\\n#]+)`, 'i'));
   return m ? m[1].trim() : '—';
@@ -256,6 +311,18 @@ function getMilestone(labels) {
   return names.find(n => /^M\d$/.test(n)) || '?';
 }
 
+function enrich(issue) {
+  return {
+    ...issue,
+    _builder:   extract(issue.body, 'Builder Name'),
+    _cohort:    extract(issue.body, 'Cohort'),
+    _repoUrl:   extract(issue.body, 'GitHub Repo URL'),
+    _milestone: getMilestone(issue.labels),
+    _status:    getStatus(issue.labels),
+    _days:      Math.floor((Date.now() - new Date(issue.created_at).getTime()) / 86400000),
+  };
+}
+
 function statusBadge(s) {
   const map = {
     'passed':            ['passed',            '✅ Passed'],
@@ -267,14 +334,6 @@ function statusBadge(s) {
   return `<span class="badge ${cls}">${label}</span>`;
 }
 
-function formatDate(iso) {
-  return new Date(iso).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
-}
-
-function daysAgo(iso) {
-  return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
-}
-
 function daysBadge(days, status) {
   if (status === 'passed') return `<span class="days ok">${days}d</span>`;
   if (days >= 5) return `<span class="days breach">🔴 ${days}d</span>`;
@@ -282,31 +341,87 @@ function daysBadge(days, status) {
   return `<span class="days ok">${days}d</span>`;
 }
 
-function buildTable(issues) {
+function formatDate(iso) {
+  return new Date(iso).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function applyFilters(issues) {
+  const q  = (document.getElementById('search')?.value || '').toLowerCase().trim();
+  const fm = document.getElementById('filter-milestone')?.value || '';
+  const fs = document.getElementById('filter-status')?.value || '';
+  return issues.filter(i => {
+    if (q  && !`${i._builder} ${i._cohort} ${i._milestone}`.toLowerCase().includes(q)) return false;
+    if (fm && i._milestone !== fm) return false;
+    if (fs && i._status    !== fs) return false;
+    return true;
+  });
+}
+
+function applySort(issues, tableKey) {
+  const { col, dir } = sortState[tableKey];
+  return [...issues].sort((a, b) => {
+    let av, bv;
+    if      (col === 'builder')   { av = a._builder;   bv = b._builder; }
+    else if (col === 'cohort')    { av = a._cohort;     bv = b._cohort; }
+    else if (col === 'milestone') { av = MILESTONES.indexOf(a._milestone); bv = MILESTONES.indexOf(b._milestone); }
+    else if (col === 'days')      { av = a._days;       bv = b._days; }
+    else if (col === 'status')    { av = a._status;     bv = b._status; }
+    else                          { av = a.created_at;  bv = b.created_at; }
+    if (av < bv) return dir === 'asc' ? -1 : 1;
+    if (av > bv) return dir === 'asc' ?  1 : -1;
+    return 0;
+  });
+}
+
+function thSort(tableKey, col, label) {
+  const s = sortState[tableKey];
+  const active = s.col === col;
+  const cls    = active ? s.dir : '';
+  const icon   = active ? (s.dir === 'asc' ? '↑' : '↓') : '↕';
+  return `<th class="sortable ${cls}" onclick="handleSort('${tableKey}','${col}')">${label} <span class="sort-icon">${icon}</span></th>`;
+}
+
+function handleSort(tableKey, col) {
+  const s = sortState[tableKey];
+  if (s.col === col) { s.dir = s.dir === 'asc' ? 'desc' : 'asc'; }
+  else               { s.col = col; s.dir = 'asc'; }
+  renderAll();
+}
+
+function buildTable(issues, tableKey) {
   if (!issues.length) return `<div class="empty">No submissions here.</div>`;
+  const rows = applySort(applyFilters(issues), tableKey);
+  if (!rows.length) return `<div class="empty">No results match your filters.</div>`;
   return `<table>
     <thead><tr>
-      <th>Builder</th><th>Cohort</th><th>Milestone</th><th>Submitted</th><th>Days</th><th>Status</th><th>Repo</th><th>Issue</th>
+      ${thSort(tableKey,'builder','Builder')}
+      ${thSort(tableKey,'cohort','Cohort')}
+      ${thSort(tableKey,'milestone','Milestone')}
+      ${thSort(tableKey,'days','Submitted')}
+      ${thSort(tableKey,'days','Days')}
+      ${thSort(tableKey,'status','Status')}
+      <th>Repo</th><th>Issue</th>
     </tr></thead>
-    <tbody>${issues.map(i => {
-      const builder   = extract(i.body, 'Builder Name');
-      const cohort    = extract(i.body, 'Cohort');
-      const repoUrl   = extract(i.body, 'GitHub Repo URL');
-      const milestone = getMilestone(i.labels);
-      const status    = getStatus(i.labels);
-      const days      = daysAgo(i.created_at);
-      return `<tr>
-        <td>${builder}</td>
-        <td>${cohort}</td>
-        <td><span class="m-badge">${milestone}</span></td>
-        <td>${formatDate(i.created_at)}</td>
-        <td>${daysBadge(days, status)}</td>
-        <td>${statusBadge(status)}</td>
-        <td>${repoUrl !== '—' ? `<a href="${repoUrl}" target="_blank">repo ↗</a>` : '—'}</td>
-        <td><a href="${i.html_url}" target="_blank">#${i.number}</a></td>
-      </tr>`;
-    }).join('')}</tbody>
+    <tbody>${rows.map(i => `<tr>
+      <td>${i._builder}</td>
+      <td>${i._cohort}</td>
+      <td><span class="m-badge">${i._milestone}</span></td>
+      <td>${formatDate(i.created_at)}</td>
+      <td>${daysBadge(i._days, i._status)}</td>
+      <td>${statusBadge(i._status)}</td>
+      <td>${i._repoUrl !== '—' ? `<a href="${i._repoUrl}" target="_blank">repo ↗</a>` : '—'}</td>
+      <td><a href="${i.html_url}" target="_blank">#${i.number}</a></td>
+    </tr>`).join('')}</tbody>
   </table>`;
+}
+
+function renderAll() {
+  const pending     = allIssues.filter(i => i._status === 'pending-review');
+  const improvement = allIssues.filter(i => i._status === 'needs-improvement');
+
+  document.getElementById('queue-pending').innerHTML     = buildTable(pending,     'pending');
+  document.getElementById('queue-improvement').innerHTML = buildTable(improvement, 'improvement');
+  document.getElementById('queue-all').innerHTML         = buildTable(allIssues,   'all');
 }
 
 async function fetchAll() {
@@ -325,19 +440,21 @@ async function fetchAll() {
 async function load() {
   document.getElementById('last-updated').textContent = 'Loading…';
 
-  const issues      = await fetchAll();
-  const pending     = issues.filter(i => i.state === 'open' && getStatus(i.labels) === 'pending-review');
-  const improvement = issues.filter(i => i.state === 'open' && getStatus(i.labels) === 'needs-improvement');
-  const passed      = issues.filter(i => getStatus(i.labels) === 'passed');
+  const raw  = await fetchAll();
+  allIssues  = raw.map(enrich);
 
-  document.getElementById('s-total').textContent       = issues.length;
+  const passed      = allIssues.filter(i => i._status === 'passed');
+  const pending     = allIssues.filter(i => i._status === 'pending-review');
+  const improvement = allIssues.filter(i => i._status === 'needs-improvement');
+
+  document.getElementById('s-total').textContent       = allIssues.length;
   document.getElementById('s-pending').textContent     = pending.length;
   document.getElementById('s-improvement').textContent = improvement.length;
   document.getElementById('s-passed').textContent      = passed.length;
 
   document.getElementById('milestone-grid').innerHTML = MILESTONES.map(m => {
-    const mAll    = issues.filter(i => getMilestone(i.labels) === m);
-    const mPassed = mAll.filter(i => getStatus(i.labels) === 'passed').length;
+    const mAll    = allIssues.filter(i => i._milestone === m);
+    const mPassed = mAll.filter(i => i._status === 'passed').length;
     return `<div class="milestone-col">
       <div class="m-label">${m}</div>
       <div class="m-bar">
@@ -347,9 +464,7 @@ async function load() {
     </div>`;
   }).join('');
 
-  document.getElementById('queue-pending').innerHTML     = buildTable(pending);
-  document.getElementById('queue-improvement').innerHTML = buildTable(improvement);
-  document.getElementById('queue-all').innerHTML         = buildTable(issues);
+  renderAll();
 
   document.getElementById('last-updated').textContent =
     'Updated ' + new Date().toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });
