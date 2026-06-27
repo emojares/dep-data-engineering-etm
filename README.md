@@ -1,108 +1,74 @@
-# DEP Data Engineering Open Track: A 6-Month Project-Driven Build Journey
+# Flood Vulnerability in Calumpit (A Data‑Driven Visual Storytelling and Risk Analysis Approach)
+## A part of DEP Data Engineering Open Track: A 6-Month Project-Driven Build Journey 
 
-> A 6-month, self-paced, project-driven learning journey. Participants build a real, deployable data project using free and open-source tools.
+> The project serves as a data-building initiative designed to use and integrate existing data sets to form a clear accesible and actionable view of Calumpit's flood risks
+>> DEP is A 6-month, self-paced, project-driven learning journey where participants build a real, deployable data project using free and open-source tools.
 
-**Cohort:** June – November 2026 &nbsp;|&nbsp; **Time:** ~5 hrs/week &nbsp;|&nbsp; **Cost:** Free
-
----
-
-## What You'll Build
-
-By the end of the program, every participant will have:
-
-- A **public GitHub repo** with a clean, documented data project
-- An **end-to-end data pipeline** (ingest → clean → analyze → deploy)
-- An **analysis notebook** with charts, statistics, and written insights
-- A **live deployed dashboard** (GitHub Pages)
+**Timeline:** June – November 2026 &nbsp;|&nbsp; **Cost:** Free
 
 ---
 
-## Program Design
+### Problem Statement
 
-| | |
-|-|-|
-| **Duration** | 24 weeks (~5 hours/week, ~120 hours total) |
-| **Weekly Rule** | 1 primary resource + 1 optional max; every week produces a project artifact |
-| **Design Principles** | Project-first · milestone-driven · public accountability · low-overwhelm resource curation |
-| **Resource Rule** | Prefer official docs, interactive tools, or one proven course. Avoid multiple full courses in the same week. |
-| **Tool Stack** | Free tools only: GitHub, Python, SQL, HTML. Optional tools (Tableau, etc.) are learner-driven. |
+Calumpit, Bulacan continues to experience recurring and often severe flooding driven by a combination of rainfall intensity, dam discharge levels, and high‑tide conditions. The project aims to transforming raw data into accessible visual narratives and structured risk assessments by identifying the following:
+
+- Which locations are flood‑prone
+- Visualize how different environmental conditions contribute to flooding
+- Specific risks are to households, businesses, road networks, and potential land‑locked zones. 
 
 ---
 
-## How to Use This Repo
+### Audience
 
-This is the **program hub** — it contains the curriculum, weekly resources, and milestone guides.
-
-**Builders:** Follow the phase folders in order. Each week folder has resources, tasks, and links.
-
-**Volunteers:** See [docs/VOLUNTEER_GUIDE.md](docs/VOLUNTEER_GUIDE.md) for your role and responsibilities.
+- Residents, communities and local organizations from Calumpit, Bulacan
+- Government Stakeholders
+- Businesses Sector
 
 ---
 
-## Stuck Protocol
+### Dashboard
 
-> If you have spent more than **2 hours** on one problem without progress:
->
-> 1. Write down exactly what you tried
-> 2. Post in the DEP community channel with your error message and code snippet
-> 3. Tag your moderator
->
-> **Do NOT skip ahead.** Moderators flag stuck participants for Ops Lead review within 48 hours.
-> You may not advance to the next milestone while a blocker is unresolved.
+Through accessible and intuitive visual storytelling, the dashboard aims to provide tools for anticipating risks, respond proactively, and enhance overall community resilience.
 
----
-
-## Curriculum
-
-| Phase | Weeks | Focus | Output |
-|-------|-------|-------|--------|
-| [01 — Foundations](01-foundations/) | 1–4 | Problem framing, data source discovery, GitHub + Python basics | Problem statement + first raw data pull |
-| [02 — Data Collection](02-data-collection/) | 5–6 | API fundamentals, alternate ingestion paths (scraping / manual) | Ingestion script + raw data in `/data/raw` |
-| [03 — Data Processing](03-data-processing/) | 7–12 | Storage/data modeling, SQL, Pandas cleaning, data quality, pipeline structuring | Clean, schema-defined dataset + reproducible pipeline |
-| [04 — Analysis & Insights](04-analysis-and-insights/) | 13–16 | Descriptive stats, EDA, visualization, insight writing | Insights notebook with 3–5 charts |
-| [05A — Predictive Layer](05-project-packaging/) *(Path A — conditional)* | 17–20 | Regression, classification, feature engineering, ML pipeline integration | Predictive model + evaluation metrics |
-| [05B — Non-Predictive Alt Track](05-project-packaging/) *(Path B — conditional)* | 17–20 | Advanced segmentation, KPI framework, stakeholder narrative, repo integration | Advanced analysis + stakeholder brief |
-| [06 — Deployment](06-deployment/) | 21–24 | Dashboard design + build, GitHub Pages deploy, documentation polish, presentation | Live project URL + portfolio-ready repo |
+-  Status Indicator
+-  Active alert\risk levels for forecasted areas\location\roads (NLEX and San Marcos)
+    - Number of Population Affected,
+    - Number of Homes,
+    - Number of Businesses,
+    - Economic impact (agriculture\infrastructure),
+    - Traffic\Routes available,
+    - Identified evacuation centres
+-  Display current water levels of Angat and Pampanga rivers due to high tide\low tide
+-  Display dam data
+-  Display rainfall data based from
+    - Rain intensity (mm per hour), 
+    - Rain duration,
+    - Total rain accumulated,
+    - Forecast when flooding occurs
 
 ---
 
-## Milestones
+## Data Sources
 
-Progress is tracked through 7 milestones (M0–M6). Each one has a clear output and a submission form.
-
-| Milestone | When | Output |
-|-----------|------|--------|
-| M0 — Problem Statement | End of Week 1 | Specific question + audience + possible data source + README in learner's own words |
-| M1 — Data Source Identified / Repo Initialized | By Week 3–4 | Working repo + chosen source + README data section complete |
-| M2 — Data Ingestion Script | By Week 6 | Raw data in `/data/raw` via API, scraping, or manual timestamped save |
-| M3 — Clean Dataset | By Week 12 | Processed dataset + schema plan + cleaning notes + validation checks |
-| M4 — Initial Insights | By Week 16 | 3–5 charts + written interpretations + one cautious inference section |
-| M5 — Public Repo / Predictive Component | By Week 20–23 | Professional repo + predictive layer (Path A) OR advanced EDA + stakeholder brief (Path B) |
-| M6 — Live Deployment | By Week 24 | Live GitHub Pages URL + presentable final project |
-
-> **Gates:** M0 and M1 are hard gates. Learners must not proceed to the next phase without moderator review and approval.
-
-Full checklist: [docs/MILESTONE_CHECKLIST.md](docs/MILESTONE_CHECKLIST.md)
-
----
-
-## Getting Started (Participants)
-
-1. **Join the community** — [Join the DEP Discord](https://discord.com/invite/buDgydz7J9)
-2. **Set up your project repo** — copy the [DEP Starter Kit](cohorts/starter-kit/) scaffold into your own GitHub repo
-3. **Start Phase 1** — go to [01-foundations/](01-foundations/) and begin Week 1
-
----
-
-## Tech Stack
-
-![DEP Tech Stack](docs/stack-diagram.svg)
-
----
-
-## Cohorts
-
-- [2026 Cohort](cohorts/2026/) — June–November 2026 *(current)*
+> **Potential Data Sources for the flooding**
+> - LiPAD Portal
+> - Project NOAH
+> - PDRRMO Bulacan Flood Markers\Hazard Maps
+> - PAGASA (DOST) / PRFFWC (Pampanga River Basin Flood Forecasting & Warning Center) / PAGASA – Hydromet / PAGASA Tide and Astronomical Data
+> - HEC-RAS Basin Models
+> - NWRB (National Water Resources Board) / Angat Dam / Ipo Dam / Bustos Dam Operators
+> - NAMRIA Tide Stations
+> 
+> **Potential Data Sources for the economic impact of flooding**
+> - The Toll Regulatory Board (TRB) Dataset via eFOI
+> - NDRRMC	Damage cost (agri + infra)	Baseline economic loss
+> - PDRRMO	Localized damage	Barangay-level impact
+> - MDRRMO	On-ground reports	Real-time impact
+> - DA	Crop & livestock losses	Agriculture impact
+> - DPWH	Road & bridge damage	Infrastructure impact
+> - DTI	Business losses	Economic activity impact
+> - PSA Commodity Flow Reports
+> - NLEX Corporation Public Disclosures
 
 ---
 
