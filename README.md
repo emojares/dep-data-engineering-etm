@@ -1,8 +1,7 @@
-# Flood Vulnerability in Calumpit (A Data‑Driven Visual Storytelling and Risk Analysis Approach)
+# Flood Watch in Calumpit
 ## A part of DEP Data Engineering Open Track: A 6-Month Project-Driven Build Journey 
 
 > The project serves as a data-building initiative designed to use and integrate existing data sets to form a clear accesible and actionable view of Calumpit's flood risks
->> DEP is A 6-month, self-paced, project-driven learning journey where participants build a real, deployable data project using free and open-source tools.
 
 **Timeline:** June – November 2026 &nbsp;|&nbsp; **Cost:** Free
 
@@ -10,25 +9,25 @@
 
 ### Problem Statement
 
-Calumpit, Bulacan continues to experience recurring and often severe flooding driven by a combination of rainfall intensity, dam discharge levels, and high‑tide conditions. The project aims to transforming raw data into accessible visual narratives and structured risk assessments by identifying the following:
+Calumpit, Bulacan continues to experience recurring and often severe flooding driven by a combination of rainfall intensity, dam discharge levels, and high‑tide conditions. The project aims to transforming raw data into accessible visual narratives and structured risk assessments by identifying the environmental conditions that contributes to flooding as well as the economic impact risks:
 
-- Which locations are flood‑prone
+- Which flood‑prone areas needs to be alerted during heavy rainfalls, when dams conduct water releases and tidal conditions
 - Visualize how different environmental conditions contribute to flooding
-- Specific risks are to households, businesses, road networks, and potential land‑locked zones. 
+- Specific risks are to households, businesses, road networks, and potential land‑locked zones.
 
 ---
 
 ### Audience
 
 - Residents, communities and local organizations from Calumpit, Bulacan
-- Government Stakeholders
+- Local Government Officials
 - Businesses Sector
 
 ---
 
 ### Dashboard
 
-Through accessible and intuitive visual storytelling, the dashboard aims to provide tools for anticipating risks, respond proactively, and enhance overall community resilience.
+The dashboard aims to provide tools for anticipating risks, respond proactively, and enhance overall community resilience.
 
 -  Status Indicator
 -  Active alert\risk levels for forecasted areas\location\roads (NLEX and San Marcos)
@@ -44,7 +43,7 @@ Through accessible and intuitive visual storytelling, the dashboard aims to prov
     - Rain intensity (mm per hour), 
     - Rain duration,
     - Total rain accumulated,
-    - Forecast when flooding occurs
+    - Forecast risk when flooding occurs based from historical records
 
 ---
 
@@ -69,12 +68,6 @@ Through accessible and intuitive visual storytelling, the dashboard aims to prov
 > - DTI	Business losses	Economic activity impact
 > - PSA Commodity Flow Reports
 > - NLEX Corporation Public Disclosures
-
----
-
-## For Volunteers
-
-See [docs/VOLUNTEER_GUIDE.md](docs/VOLUNTEER_GUIDE.md) for role descriptions, responsibilities, and the operating rhythm.
 
 ---
 
